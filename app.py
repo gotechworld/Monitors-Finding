@@ -509,7 +509,7 @@ with tab2:
         include_shop = st.checkbox("🛒 Include magazin specific", value=False)
 
     if include_shop:
-        shop_options = ["emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "nod.ro", "cel.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro", "evomag.ro", "flanco.ro", "itgalaxy.ro", "forit.ro", "vexio.ro"]
+        shop_options = ["emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "nod.ro", "cel.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro", "evomag.ro"]
         selected_shop = st.selectbox("Selectați magazinul:", shop_options)
 
     # Generate Google search query

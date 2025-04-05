@@ -211,13 +211,54 @@ def generate_pdf(selected_categories, selected_options, specs, options):
 # Function for Google search using Serper.dev
 def google_search(query):
     headers = {"X-API-KEY": serper_api_key}
+    # Add Romanian site restriction and language parameter
+    if "site:.ro" not in query:
+        query += " site:.ro"
+
+    # Add language restriction to Romanian
+    if "&lr=lang_ro" not in query:
+        query += " &lr=lang_ro"
+
+    # Explicitly exclude international sites
+    excluded_sites = [
+        "amazon.com", "ebay.com", "aliexpress.com", "walmart.com", "bestbuy.com",
+        "newegg.com", "bhphotovideo.com", "adorama.com", "currys.co.uk", "argos.co.uk",
+        "mediamarkt.de", "saturn.de", "fnac.com", "darty.com", "ldlc.com", "otto.de",
+        "conrad.de", "verkkokauppa.com", "komplett.no", "elkjop.no", "power.no",
+        "coolblue.nl", "bol.com", "mediamarkt.nl", "amazon.co.uk", "amazon.de",
+        "amazon.fr", "amazon.it", "amazon.es", "amazon.nl", "amazon.se"
+    ]
+
+    for site in excluded_sites:
+        if f"-site:{site}" not in query:
+            query += f" -site:{site}"
+
     payload = {"q": query}
+
     try:
         with st.spinner("🔍 Cautare in progres..."):
             response = requests.post(SERPER_API_URL, json=payload, headers=headers)
         if response.status_code == 200:
             st.success("✅ Cautare finalizata cu succes!")
-            return response.json()
+            # Filter results to only include Romanian domains
+            results = response.json()
+            if "organic" in results:
+                filtered_organic = []
+                for result in results["organic"]:
+                    link = result.get("link", "")
+                    domain = link.split('/')[2] if '/' in link else ""
+
+                    # Check if domain ends with .ro or is a known Romanian site
+                    if domain.endswith(".ro") or any(ro_site in domain for ro_site in [
+                        "emag", "pcgarage", "altex", "mediagalaxy", "cel", "evomag",
+                        "itgalaxy", "forit", "vexio", "dc-shop", "f64", "photosetup",
+                        "flanco", "nod", "probitz", "bsp-shop", "iiyama-eshop"
+                    ]):
+                        filtered_organic.append(result)
+
+                results["organic"] = filtered_organic
+
+            return results
         else:
             st.error(f"❌ Eroare la interogarea API-ului Serper.dev: {response.status_code}")
             st.write(f"Raspuns API: {response.text}")
@@ -555,16 +596,13 @@ with tab2:
                 if include_price:
                     query_parts.append("pret")
 
-                # Add Romanian site restriction
+                # Add shop if selected
                 if include_shop and selected_shop:
                     # If a specific shop is selected, use that
                     query_parts.append(f"site:{selected_shop}")
                 else:
                     # Otherwise, restrict to Romanian sites only
                     query_parts.append("site:.ro")
-
-                # Explicitly exclude international sites
-                query_parts.append("-site:amazon.com; -site:ebay.com; -site:aliexpress.com; -site:walmart.com; -site:bestbuy.com")
 
                 # Add custom search term if provided
                 if search_query:
@@ -573,6 +611,18 @@ with tab2:
                 # Combine all parts
                 final_query = " ".join(query_parts)
 
+                # Add Romanian domains to include in search
+                romanian_domains = [
+                    "emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "cel.ro",
+                    "evomag.ro", "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro",
+                    "f64.ro", "photosetup.ro", "flanco.ro", "nod.ro", "probitz.ro",
+                    "bsp-shop.ro", "iiyama-eshop.ro"
+                ]
+
+                # Add site:.ro restriction if not already included
+                if "site:.ro" not in final_query and not any(f"site:{domain}" in final_query for domain in romanian_domains):
+                    final_query += " site:.ro"
+              
                 # Add language restriction to Romanian
                 final_query += " &lr=lang_ro"
 

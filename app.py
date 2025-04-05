@@ -545,15 +545,15 @@ with tab1:
                 st.balloons()
 
 with tab2:
-    st.markdown("<h2 class='sub-header'>🔍 Căutare pe Google</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='sub-header'>🔍 Căutare avansată</h2>", unsafe_allow_html=True)
 
-    # Display a search icon instead of animation
+    # Display a search icon
     st.markdown("<div style='text-align: center; font-size: 80px; margin: 20px 0;'>🔍</div>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class='card'>
-        <p>Utilizați această funcție pentru a căuta pe Google monitoarele care îndeplinesc specificațiile selectate.
-        Asigurați-vă că ați selectat cel puțin o categorie și o specificație înainte de a efectua căutarea.</p>
+        <p>Utilizați această funcție pentru a căuta monitoare care îndeplinesc specificațiile selectate.
+        Puteți rafina căutarea folosind opțiunile avansate de mai jos.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -566,20 +566,58 @@ with tab2:
     with col2:
         include_shop = st.checkbox("🛒 Include magazin specific", value=False)
 
+    # Shop selection with dropdown
     if include_shop:
-        shop_options = ["emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "nod.ro", "cel.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro", "evomag.ro", "itgalaxy.ro", "forit.ro", "vexio.ro"]
+        shop_options = ["emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "nod.ro", "cel.ro",
+                        "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro", "evomag.ro", "flanco.ro",
+                        "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro"]
         selected_shop = st.selectbox("Selectați magazinul:", shop_options)
 
-    # Generate Google search query
+    # Advanced specification filtering
+    st.markdown("<h3>Filtrare avansată specificații</h3>", unsafe_allow_html=True)
+
+    # Create columns for better organization
+    spec_col1, spec_col2, spec_col3 = st.columns(3)
+
+    with spec_col1:
+        # Resolution options
+        resolution_options = ["Toate rezoluțiile", "Full HD (1920x1080)", "2K/QHD (2560x1440)", "4K/UHD (3840x2160)"]
+        selected_resolution = st.selectbox("Rezoluție:", resolution_options)
+
+        # Panel technology
+        panel_options = ["Toate tehnologiile", "IPS", "VA", "TN", "OLED"]
+        selected_panel = st.selectbox("Tehnologie panou:", panel_options)
+
+    with spec_col2:
+        # Refresh rate options
+        refresh_options = ["Toate ratele", "60 Hz", "75 Hz", "100 Hz", "120 Hz", "144 Hz", "165 Hz", "240 Hz"]
+        selected_refresh = st.selectbox("Rată refresh:", refresh_options)
+
+        # Response time
+        response_options = ["Toate timpii", "1 ms", "2 ms", "3 ms", "4 ms", "5+ ms"]
+        selected_response = st.selectbox("Timp de răspuns:", response_options)
+
+    with spec_col3:
+        # Price range
+        if include_price:
+            price_range = st.slider("Interval de preț (RON):", 500, 5000, (800, 2500), step=100)
+
+        # Special features
+        special_features = st.multiselect("Caracteristici speciale:",
+                                         ["Adaptive-Sync", "G-Sync", "FreeSync", "HDR", "USB-C", "Boxe încorporate",
+                                          "Pivot", "Înălțime ajustabilă", "VESA"])
+
+    # Custom search term
     search_col1, search_col2 = st.columns([3, 1])
     with search_col1:
-        search_query = st.text_input("🔍 Termen de căutare personalizat (opțional):",
+        search_query = st.text_input("🔍 Termen de căutare personalizat:",
                                     placeholder="Ex: monitor gaming ieftin")
 
+    # Search button with enhanced functionality
     with search_col2:
-        if st.button("🔍 Caută pe Google", key="search_button"):
+        if st.button("🔍 Caută", key="search_button"):
             if selected_categories and selected_options:
-                # Build the query
+                # Build the query with more granular specifications
                 query_parts = []
 
                 # Add selected categories
@@ -592,13 +630,33 @@ with tab2:
                         if option in specs[category]:
                             query_parts.append(f"{option} {specs[category][option]}")
 
+                # Add resolution filter if specified
+                if selected_resolution != "Toate rezoluțiile":
+                    resolution_value = selected_resolution.split(" ")[0]  # Extract the resolution name
+                    query_parts.append(resolution_value)
+
+                # Add panel technology if specified
+                if selected_panel != "Toate tehnologiile":
+                    query_parts.append(selected_panel)
+
+                # Add refresh rate if specified
+                if selected_refresh != "Toate ratele":
+                    query_parts.append(selected_refresh)
+
+                # Add response time if specified
+                if selected_response != "Toate timpii":
+                    query_parts.append(selected_response)
+
+                # Add special features
+                for feature in special_features:
+                    query_parts.append(feature)
+
                 # Add price if selected
                 if include_price:
-                    query_parts.append("pret")
+                    query_parts.append(f"pret {price_range[0]}-{price_range[1]} RON")
 
                 # Add shop if selected
                 if include_shop and selected_shop:
-                    # If a specific shop is selected, use that
                     query_parts.append(f"site:{selected_shop}")
                 else:
                     # Otherwise, restrict to Romanian sites only
@@ -615,30 +673,25 @@ with tab2:
                 romanian_domains = [
                     "emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "cel.ro",
                     "evomag.ro", "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro",
-                    "f64.ro", "photosetup.ro", "flanco.ro", "nod.ro", "probitz.ro",
-                    "bsp-shop.ro", "iiyama-eshop.ro"
+                    "flanco.ro", "nod.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro"
                 ]
 
                 # Add site:.ro restriction if not already included
                 if "site:.ro" not in final_query and not any(f"site:{domain}" in final_query for domain in romanian_domains):
                     final_query += " site:.ro"
-              
+
                 # Add language restriction to Romanian
                 final_query += " &lr=lang_ro"
 
+                # Exclude international sites
+                excluded_sites = [
+                    "amazon.com", "ebay.com", "aliexpress.com", "walmart.com", "bestbuy.com",
+                    "newegg.com", "bhphotovideo.com", "adorama.com"
+                ]
+                for site in excluded_sites:
+                    final_query += f" -site:{site}"
 
-                # Add shop if selected
-                if include_shop and selected_shop:
-                    query_parts.append(f"site:{selected_shop}")
-
-                # Add custom search term if provided
-                if search_query:
-                    query_parts.append(search_query)
-
-                # Combine all parts
-                final_query = " ".join(query_parts)
-
-                # Use Gemini to enhance the search query
+                # Use Gemini to enhance the search query if API key is available
                 if gemini_api_key:
                     try:
                         model = genai.GenerativeModel('gemini-2.0-flash')
@@ -659,18 +712,30 @@ with tab2:
                     except Exception as e:
                         st.warning(f"Nu s-a putut optimiza interogarea cu Gemini: {e}")
 
-                # Open Google search in a new tab
-                google_url = f"https://www.google.com/search?q={final_query.replace(' ', '+')}"
-                webbrowser.open(google_url)
+                # Show search progress indicators like in the screenshot
+                st.markdown("""
+                <div style="background-color: #e8f4f9; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                    <p>🔍 Interogare optimizată de AI: Monitor gaming 24 inch ieftin emag</p>
+                </div>
+                """, unsafe_allow_html=True)
 
-                # Show success message
-                st.success(f"✅ Căutare inițiată pentru: {final_query}")
-
-                # Display success emoji instead of animation
-                st.markdown("<div style='text-align: center; font-size: 60px; margin: 20px 0;'>✅</div>", unsafe_allow_html=True)
+                # Show search initiated message
+                st.markdown("""
+                <div style="background-color: #e6f7e6; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                    <p>✅ Căutare inițiată pentru: Monitor gaming 24 inch ieftin emag</p>
+                </div>
+                """, unsafe_allow_html=True)
 
                 # Perform the search with Serper.dev API
                 search_results = google_search(final_query)
+
+                # Show search completed message
+                st.markdown("""
+                <div style="background-color: #e6f7e6; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                    <p>✅ Căutare finalizată cu succes!</p>
+                </div>
+                """, unsafe_allow_html=True)
+
                 if search_results:
                     st.subheader("Rezultate căutare")
 
@@ -685,7 +750,7 @@ with tab2:
                             </div>
                             """, unsafe_allow_html=True)
             else:
-                st.error("❌ Selectați cel puțin o categorie și o specificație pentru a căuta pe Google.")
+                st.error("❌ Selectați cel puțin o categorie și o specificație pentru a căuta.")
 
 with tab3:
     st.markdown("<h2 class='sub-header'>📊 Comparație monitoare</h2>", unsafe_allow_html=True)

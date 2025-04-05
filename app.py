@@ -277,6 +277,23 @@ with st.sidebar:
     with col3:
         st.metric(label="Utilizatori", value=str(random.randint(120, 500)))
 
+    # API status indicators
+    st.markdown("---")
+    st.markdown("### 🔑 Status API")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if serper_api_key:
+            st.markdown("🟢 Serper.dev")
+        else:
+            st.markdown("🔴 Serper.dev")
+
+    with col2:
+        if gemini_api_key:
+            st.markdown("🟢 Gemini")
+        else:
+            st.markdown("🔴 Gemini")
+
 # Main content
 st.markdown("<h1 class='main-header'>🔍 Specificații Tehnice pentru Monitoare</h1>", unsafe_allow_html=True)
 

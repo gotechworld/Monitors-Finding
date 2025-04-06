@@ -251,8 +251,9 @@ def google_search(query):
                     # Check if domain ends with .ro or is a known Romanian site
                     if domain.endswith(".ro") or any(ro_site in domain for ro_site in [
                         "emag", "pcgarage", "altex", "mediagalaxy", "cel", "evomag",
-                        "itgalaxy", "forit", "vexio", "dc-shop", "f64", "photosetup",
-                        "flanco", "nod", "probitz", "bsp-shop", "iiyama-eshop"
+                        "itgalaxy", "forit", "vexio", "dc-shop",
+                        "flanco", "nod", "probitz", "bsp-shop", "iiyama-eshop", 
+                        "soliton", "picxelit", "badabum"
                     ]):
                         filtered_organic.append(result)
 
@@ -570,7 +571,8 @@ with tab2:
     if include_shop:
         shop_options = ["emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "nod.ro", "cel.ro",
                         "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro", "evomag.ro", "flanco.ro",
-                        "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro"]
+                        "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro", 
+                        "soliton.ro", "picxelit.ro", "badabum.ro"]
         selected_shop = st.selectbox("Selectați magazinul:", shop_options)
 
     # Advanced specification filtering
@@ -673,7 +675,8 @@ with tab2:
                 romanian_domains = [
                     "emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "cel.ro",
                     "evomag.ro", "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro",
-                    "flanco.ro", "nod.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro"
+                    "flanco.ro", "nod.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro",
+                    "soliton.ro", "picxelit.ro", "badabum.ro"
                 ]
 
                 # Add site:.ro restriction if not already included

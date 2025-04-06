@@ -573,7 +573,7 @@ with tab2:
         shop_options = ["emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "nod.ro", "cel.ro",
                         "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro", "evomag.ro", "flanco.ro",
                         "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro", 
-                        "soliton.ro", "picxelit.ro", "badabum.ro", "powerup.ro"]
+                        "soliton.ro", "picxelit.ro", "badabum.ro", "powerup.ro", "citgrup.ro"]
         selected_shop = st.selectbox("Selectați magazinul:", shop_options)
 
     # Advanced specification filtering
@@ -677,7 +677,7 @@ with tab2:
                     "emag.ro", "pcgarage.ro", "altex.ro", "mediagalaxy.ro", "cel.ro",
                     "evomag.ro", "itgalaxy.ro", "forit.ro", "vexio.ro", "dc-shop.ro",
                     "flanco.ro", "nod.ro", "probitz.ro", "bsp-shop.ro", "iiyama-eshop.ro",
-                    "soliton.ro", "picxelit.ro", "badabum.ro", "powerup.ro"
+                    "soliton.ro", "picxelit.ro", "badabum.ro", "powerup.ro", "citgrup.ro"
                 ]
 
                 # Add site:.ro restriction if not already included
@@ -690,7 +690,12 @@ with tab2:
                 # Exclude international sites
                 excluded_sites = [
                     "amazon.com", "ebay.com", "aliexpress.com", "walmart.com", "bestbuy.com",
-                    "newegg.com", "bhphotovideo.com", "adorama.com"
+                    "newegg.com", "bhphotovideo.com", "adorama.com", "currys.co.uk", "argos.co.uk",
+                    "mediamarkt.de", "saturn.de", "fnac.com", "darty.com", "ldlc.com", "otto.de",
+                    "conrad.de", "verkkokauppa.com", "komplett.no", "elkjop.no", "power.no",
+                    "coolblue.nl", "bol.com", "mediamarkt.nl", "amazon.co.uk", "amazon.de",
+                    "amazon.fr", "amazon.it", "amazon.es", "amazon.nl", "amazon.se", "anodos.ru",
+                    "emag.bg"
                 ]
                 for site in excluded_sites:
                     final_query += f" -site:{site}"
